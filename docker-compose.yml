@@ -1,23 +1,47 @@
-elasticsearch:
-  image: elasticsearch:latest
-  command: elasticsearch -Des.network.host=0.0.0.0
-  ports:
-    - "9200:9200"
-    - "9300:9300"
-logstash:
-  image: logstash:latest
-  command: logstash -f /etc/logstash/conf.d/logstash.conf
-  volumes:
-    - ./logstash/config:/etc/logstash/conf.d
-  ports:
-    - "5000:5000"
-  links:
-    - elasticsearch
-kibana:
-  build: kibana/
-  volumes:
-    - ./kibana/config/:/opt/kibana/config/
-  ports:
-    - "5601:5601"
-  links:
-    - elasticsearch
+version: '2'
+
+services:
+  elasticsearch:
+    image: elasticsearch:latest
+    command: elasticsearch -Des.network.host=0.0.0.0
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es-dv:/usr/share/elasticsearch/data
+  logstash:
+    image: logstash:latest
+    container_name: logstash
+    command: logstash -f /etc/logstash/conf.d/logstash.conf
+    volumes:
+      - ./logstash/config:/etc/logstash/conf.d
+    volumes_from:
+      - container:sbe:ro
+    ports:
+      - "5000:5000"
+    links:
+      - elasticsearch
+  kibana:
+    build: kibana/
+    volumes:
+      - ./kibana/config/:/opt/kibana/config/
+    ports:
+      - "5601:5601"
+    links:
+      - elasticsearch
+#  logspout:
+#    image: gliderlabs/logspout
+#    ports:
+#      - "8000:80"
+#    volumes:
+#      - /var/run/docker.sock:/tmp/docker.sock
+#    command: syslog://logstash:5000
+
+networks:
+  default:
+    external:
+      name: docker_localbridge
+
+volumes:
+  es-dv:
+    driver: local
