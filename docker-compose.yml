@@ -15,6 +15,7 @@ services:
     command: logstash -f /etc/logstash/conf.d/logstash.conf
     volumes:
       - ./logstash/config:/etc/logstash/conf.d
+      - ./logstash/patterns:/data/patterns
     volumes_from:
       - container:sbe:ro
     ports:
