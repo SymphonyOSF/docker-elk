@@ -1,0 +1,3 @@
+# look at the logstash github project for all the included patterns!
+
+SYM_DATESTAMP 20%{YEAR}-%{MONTHNUM}-%{MONTHDAY} %{HOUR}:?%{MINUTE}(?::?%{SECOND})
